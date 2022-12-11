@@ -20,7 +20,7 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 DEBUG = config('DEBUG', default=False)
 
 # load production server from .env
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', config('SERVER', default='127.0.0.1')]
+ALLOWED_HOSTS = ['107.191.40.109','localhost', '127.0.0.1', config('SERVER', default='127.0.0.1')]
 
 # Application definition
 
@@ -125,4 +125,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'core/static'),
 )
 #############################################################
-#############################################################
+#############################################################\
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

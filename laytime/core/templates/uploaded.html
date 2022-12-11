@@ -1,0 +1,35 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Đã được upload {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="main-content-container container-fluid px-4">
+    <div class="row">
+      <!-- Users Stats -->
+      <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
+        <div class="card card-small">
+          <div class="card-header border-bottom">
+            <h6 class="m-0">Nội dung file đã được xử lý</h6>
+          </div>
+          <div class="card-body pt-0">
+            <div class="row border-bottom py-2 bg-light">
+              <div class="col-12 col-sm-6">
+                Chuyển hướng tới trang kết quả {{ uploaded_file_url }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Users Stats -->
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
