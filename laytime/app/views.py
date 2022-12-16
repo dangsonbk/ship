@@ -3,13 +3,14 @@
 License: MIT
 Copyright (c) 2019 - present AppSeed.us
 """
-
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import loader
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django import template
-from app.forms import DocumentForm
+from app.forms import UploadFileForm
 from app.models import Document
 
 @login_required(login_url="/login/")
@@ -20,8 +21,7 @@ def index(request):
 def pages(request):
     context = {}
     try:
-        load_template = request.path.split('/')[-1]
-        html_template = loader.get_template( load_template )
+        html_template = loader.get_template(request.path.split('/')[-1])
     except template.TemplateDoesNotExist:
         html_template = loader.get_template( 'error-404.html' )
     except:
@@ -30,12 +30,10 @@ def pages(request):
         return HttpResponse(html_template.render(context, request))
 
 @login_required(login_url="/login/")
-def excel_upload(request):
+@csrf_exempt
+def document_upload(request):
     if request.method == 'POST':
-        form = DocumentForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = DocumentForm()
-    return render(request, 'uploaded.html', {'form': form})
+        document = request.FILES.get("file")
+        title = request.POST.get("title")
+        print(title)
+    return render(request, 'uploaded.html')

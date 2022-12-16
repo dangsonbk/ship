@@ -19,18 +19,22 @@
     <!-- Small Stats Blocks -->
     <div class="row">
       <div class="col-lg col-md-6 col-sm-6 mb-4">
-        <div class="stats-small stats-small--1 card card-small">
-          <div class="card-body p-0 d-flex">
-            <div class="d-flex flex-column m-auto">
-              <div class="stats-small__data text-center">
-                <form method="post" enctype="multipart/form-data">
-                  {% csrf_token %}
-                  {{ form.as_p }}
-                  <button type="submit" class="btn btn-lg btn-outline-primary">Upload</button>
-                </form>
+        <div class="stats-small stats-small--1 card card-small">  
+          <div class="card-body p-0 d-flex" style="margin: 0 auto;">
+            <div class="file-upload-wrap">
+              <input class="file-upload-input" type='file' onchange="readURL(this);" accept=".xlsx" />
+              <div class="drag-text">
+                <h3>Kéo thả hoặc bấm vào để upload</h3>
               </div>
             </div>
-            <canvas height="120" class="blog-overview-stats-small-1"></canvas>
+            <div class="file-upload-content">
+              <img class="file-upload-image" src="/static/assets/img/xlsx.png" alt="xlsx" />
+              <span class="file-title"></span>
+              <div class="file-title-wrap">
+                <button type="button" class="btn btn-primary" onclick="file_analyze()">Chi tiết</button>
+                <button type="button" class="btn btn-danger" onclick="file_remove()">Hủy bỏ</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -39,8 +43,8 @@
           <div class="card-body p-0 d-flex">
             <div class="d-flex flex-column m-auto">
               <div class="stats-small__data text-center">
-                <span class="stats-small__label text-uppercase">Pages</span>
-                <h6 class="stats-small__value count my-3">182</h6>
+                <span class="stats-small__label text-uppercase">Số lượng tàu</span>
+                <h6 class="stats-small__value count my-3">1</h6>
               </div>
               <div class="stats-small__data">
                 <span class="stats-small__percentage stats-small__percentage--increase">12.4%</span>
@@ -55,7 +59,7 @@
           <div class="card-body p-0 d-flex">
             <div class="d-flex flex-column m-auto">
               <div class="stats-small__data text-center">
-                <span class="stats-small__label text-uppercase">Comments</span>
+                <span class="stats-small__label text-uppercase">Thông tin mẫu 1</span>
                 <h6 class="stats-small__value count my-3">8,147</h6>
               </div>
               <div class="stats-small__data">
@@ -71,7 +75,7 @@
           <div class="card-body p-0 d-flex">
             <div class="d-flex flex-column m-auto">
               <div class="stats-small__data text-center">
-                <span class="stats-small__label text-uppercase">Users</span>
+                <span class="stats-small__label text-uppercase">Thông tin mẫu 2</span>
                 <h6 class="stats-small__value count my-3">2,413</h6>
               </div>
               <div class="stats-small__data">
@@ -87,8 +91,8 @@
           <div class="card-body p-0 d-flex">
             <div class="d-flex flex-column m-auto">
               <div class="stats-small__data text-center">
-                <span class="stats-small__label text-uppercase">Subscribers</span>
-                <h6 class="stats-small__value count my-3">17,281</h6>
+                <span class="stats-small__label text-uppercase">Thông tin mẫu 3</span>
+                <h6 class="stats-small__value count my-3">1,887.03</h6>
               </div>
               <div class="stats-small__data">
                 <span class="stats-small__percentage stats-small__percentage--decrease">2.4%</span>
@@ -112,45 +116,23 @@
               <thead class="bg-light">
                 <tr>
                   <th scope="col" class="border-0">#</th>
-                  <th scope="col" class="border-0">First Name</th>
-                  <th scope="col" class="border-0">Last Name</th>
-                  <th scope="col" class="border-0">Country</th>
-                  <th scope="col" class="border-0">City</th>
-                  <th scope="col" class="border-0">Phone</th>
+                  <th scope="col" class="border-0">Vessel/Barge</th>
+                  <th scope="col" class="border-0">Mother vessel</th>
+                  <th scope="col" class="border-0">Total time used</th>
+                  <th scope="col" class="border-0">Total time allowed</th>
+                  <th scope="col" class="border-0">Demurrage (USD)</th>
+                  <th scope="col" class="border-0">Công cụ</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>1</td>
-                  <td>Ali</td>
-                  <td>Kerry</td>
-                  <td>Russian Federation</td>
-                  <td>Gdańsk</td>
-                  <td>107-0339</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>Clark</td>
-                  <td>Angela</td>
-                  <td>Estonia</td>
-                  <td>Borghetto di Vara</td>
-                  <td>1-660-850-1647</td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>Jerry</td>
-                  <td>Nathan</td>
-                  <td>Cyprus</td>
-                  <td>Braunau am Inn</td>
-                  <td>214-4225</td>
-                </tr>
-                <tr>
-                  <td>4</td>
-                  <td>Colt</td>
-                  <td>Angela</td>
-                  <td>Liberia</td>
-                  <td>Bad Hersfeld</td>
-                  <td>1-848-473-7416</td>
+                  <td>THUAN HAI TK2/SL2</td>
+                  <td>DUBAI KNIGHT</td>
+                  <td>2.83</td>
+                  <td>1.58</td>
+                  <td>1,887.03</td>
+                  <td><a href="#">Chi tiết </a>|<a href="#"> In</a></td>
                 </tr>
               </tbody>
             </table>
