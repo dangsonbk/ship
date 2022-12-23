@@ -6,16 +6,22 @@ Copyright (c) 2019 - present AppSeed.us
 
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime
 
 # Create your models here.
 
 class Document(models.Model):
     title = models.CharField(max_length=255, blank=False)
     path = models.CharField(max_length=1000, blank=False)
-    description = models.CharField(max_length=255, blank=True)
-    document = models.FileField(upload_to='/media/')
     parsed = models.BooleanField(default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.uploaded_at.strftime("%d-%m-%Y %H:%M:%S") + " | " + self.title
+
+    class Meta:
+        verbose_name = 'File excel'
+        verbose_name_plural = 'File excel'
 
 class Laysheet(models.Model):
     document = models.OneToOneField(Document, on_delete=models.CASCADE)
@@ -31,6 +37,9 @@ class Laysheet(models.Model):
     demurrage = models.CharField(max_length=50, blank=False)
     despatch = models.CharField(max_length=50, blank=False)
     laytime_allowed = models.CharField(max_length=50, blank=False)
+
+    def __str__(self):
+        return str(self.document)
 
 class Laytime(models.Model):
     pass

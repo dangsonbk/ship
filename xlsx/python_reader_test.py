@@ -6,7 +6,7 @@ def load_excel(path):
     for ws in wb:
         title = ws["A1"].value
         if "LAYTIME CALCULATION" in title:
-            print("valid worksheet", ws.title)
+            print("Valid worksheet", ws.title)
         vehicle = ws["D2"].value
         vehicle_mother = ws["D3"].value
         discharge_port = ws["B5"].value
