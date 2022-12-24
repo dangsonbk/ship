@@ -24,7 +24,7 @@ class Document(models.Model):
         verbose_name_plural = 'File excel'
 
 class Laysheet(models.Model):
-    document = models.OneToOneField(Document, on_delete=models.CASCADE)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
     vehicle = models.CharField(max_length=1000, blank=False)
     vehicle_mother = models.CharField(max_length=1000, blank=False)
     discharge_port = models.CharField(max_length=1000, blank=False)
@@ -37,6 +37,8 @@ class Laysheet(models.Model):
     demurrage = models.CharField(max_length=50, blank=False)
     despatch = models.CharField(max_length=50, blank=False)
     laytime_allowed = models.CharField(max_length=50, blank=False)
+    real_despatch = models.FloatField(default=0)
+    real_demurrage = models.FloatField(default=0)
 
     def __str__(self):
         return str(self.document)

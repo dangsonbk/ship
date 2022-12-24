@@ -4204,6 +4204,10 @@ a.text-accent:hover, a.text-accent:focus {
   position: fixed;
   height: calc(100vh);
   background: #fff;
+  background-image: url('/static/assets/img/bottom.png');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: bottom;
   z-index: 1070;
   will-change: transform;
   transition: transform 200ms ease-in-out;

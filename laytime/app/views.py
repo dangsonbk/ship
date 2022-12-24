@@ -17,9 +17,15 @@ from openpyxl import load_workbook
 @login_required(login_url="/login/")
 def index(request):
     documents = Document.objects.all()
+    laysheets = Laysheet.objects.all()
     files = documents.order_by('-uploaded_at')[:10]
+    laysheetId = request.GET.get('laysheetId', '')
+    if laysheetId:
+        laysheets = Laysheet.objects.filter(document=int(laysheetId))
     context = {
         "file_count": documents.count(),
+        "laysheets_count": laysheets.count(),
+        "current_laysheets": laysheets,
         "files": files
     }
     return render(request, "index.html", context)
@@ -39,7 +45,7 @@ def pages(request):
 def load_excel(path):
     wb = load_workbook(path, data_only=True)
     for ws in wb:
-        if "LAYTIME CALCULATION" in ws["A1"].value:
+        if ws["A1"].value and "LAYTIME CALCULATION" in ws["A1"].value:
             print("valid worksheet", ws.title)
         else:
             continue
@@ -48,14 +54,22 @@ def load_excel(path):
         discharge_port = ws["B5"].value
         NOR_tendered = ws["G5"].value
         NOR_accepted = ws["G7"].value
+        commenced_discharging = ws["G9"].value
+        completed_discharging = ws["G11"].value
+        cargo_quantity = ws["B9"].value
+        discharge_rate = ws["B11"].value
+        demurrage = ws["B13"].value
+        despatch = ws["B14"].value
+        laytime_allowed = ws["B16"].value.strftime("%H:%M:%S")
 
-        commenced_discharging = discharge_port = ws["G9"].value
-        completed_discharging = discharge_port = ws["G11"].value
-        cargo_quantity = discharge_port = ws["B9"].value
-        discharge_rate = discharge_port = ws["B11"].value
-        demurrage = discharge_port = ws["B13"].value
-        despatch = discharge_port = ws["B14"].value
-        laytime_allowed = discharge_port = ws["B16"].value
+        despatch = 0
+        demurrage  = 0
+        for row in ws.iter_rows(min_row=20):
+            for cell in row:
+                if "Despatch (USD)" in str(cell.value):
+                    despatch = round(ws["G" + str(cell.row)].value or 0, 3)
+                if "Demurrage (USD)" in str(cell.value):
+                    demurrage = round(ws["G" + str(cell.row)].value or 0, 3)
 
         results = {
             "vehicle": vehicle,
@@ -69,10 +83,12 @@ def load_excel(path):
             "discharge_rate": discharge_rate,
             "demurrage": demurrage,
             "despatch": despatch,
-            "laytime_allowed": laytime_allowed
+            "laytime_allowed": laytime_allowed,
+            "real_despatch": despatch,
+            "real_demurrage": demurrage
         }
 
-        return results
+        yield results
 
 @login_required(login_url="/login/")
 @csrf_exempt
@@ -86,10 +102,11 @@ def document_upload(request):
             title = document_title,
             path = filename
         )
-        document_info = load_excel(fs.path(filename))
-        laysheet = Laysheet.objects.create(
-            document=db_document,
-            **document_info
-        )
+        documents_info = load_excel(fs.path(filename))
+        for document_info in documents_info:
+            laysheet = Laysheet.objects.create(
+                document=db_document,
+                **document_info
+            )
 
     return HttpResponse("success")
