@@ -45,49 +45,54 @@ def pages(request):
 def load_excel(path):
     wb = load_workbook(path, data_only=True)
     for ws in wb:
-        if ws["A1"].value and "LAYTIME CALCULATION" in ws["A1"].value:
+        if ws["A1"].value and "BẢNG TÍNH THỜI GIAN DÔI NHẬT" in ws["A1"].value:
             print("valid worksheet", ws.title)
         else:
+            print("invalid worksheet", ws.title)
             continue
-        vehicle = ws["D2"].value
-        vehicle_mother = ws["D3"].value
-        discharge_port = ws["B5"].value
-        NOR_tendered = ws["G5"].value
-        NOR_accepted = ws["G7"].value
-        commenced_discharging = ws["G9"].value
-        completed_discharging = ws["G11"].value
-        cargo_quantity = ws["B9"].value
-        discharge_rate = ws["B11"].value
-        demurrage = ws["B13"].value
-        despatch = ws["B14"].value
-        laytime_allowed = ws["B16"].value.strftime("%H:%M:%S")
+        vehicle = ws["E2"].value
+        if vehicle == "#N/A":
+            continue
+        vehicle_trip = ws["E3"].value
+        contract = ws["E4"].value
+        discharge_port = ws["B7"].value
+        arrival_windows = ws["B9"].value
+        NOR_tendered = ws["H7"].value
+        NOR_accepted = ws["H9"].value
+        commenced_discharging = ws["H11"].value
+        completed_discharging = ws["H13"].value
+        weight = ws["B11"].value
+        load = ws["B13"].value
+        despatch = ws["B15"].value
+        demurrage = ws["B17"].value
+        laytime_allowed = ws["A16"].value
 
-        despatch = 0
-        demurrage  = 0
+        real_despatch = 0
+        real_demurrage  = 0
         for row in ws.iter_rows(min_row=20):
             for cell in row:
-                if "Despatch (USD)" in str(cell.value):
-                    despatch = round(ws["G" + str(cell.row)].value or 0, 3)
-                if "Demurrage (USD)" in str(cell.value):
-                    demurrage = round(ws["G" + str(cell.row)].value or 0, 3)
+                if "Tiền thưởng" in str(cell.value):
+                    real_despatch = ws["H" + str(cell.row)].value
+                if "Tiền phạt" in str(cell.value):
+                    real_demurrage = ws["H" + str(cell.row)].value
 
         results = {
             "vehicle": vehicle,
-            "vehicle_mother": vehicle_mother,
+            "vehicle_trip": vehicle_trip,
+            "contract": contract,
             "discharge_port": discharge_port,
             "NOR_tendered": NOR_tendered,
             "NOR_accepted": NOR_accepted,
             "commenced_discharging": commenced_discharging,
             "completed_discharging": completed_discharging,
-            "cargo_quantity": cargo_quantity,
-            "discharge_rate": discharge_rate,
-            "demurrage": demurrage,
+            "weight": weight,
+            "load": load,
             "despatch": despatch,
+            "demurrage": demurrage,
             "laytime_allowed": laytime_allowed,
-            "real_despatch": despatch,
-            "real_demurrage": demurrage
+            "real_despatch": real_despatch,
+            "real_demurrage": real_demurrage
         }
-
         yield results
 
 @login_required(login_url="/login/")
@@ -104,9 +109,10 @@ def document_upload(request):
         )
         documents_info = load_excel(fs.path(filename))
         for document_info in documents_info:
-            laysheet = Laysheet.objects.create(
-                document=db_document,
-                **document_info
-            )
+            print(document_info)
+            # laysheet = Laysheet.objects.create(
+            #     document=db_document,
+            #     **document_info
+            # )
 
     return HttpResponse("success")
