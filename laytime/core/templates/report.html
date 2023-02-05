@@ -25,12 +25,27 @@
               </div>
               <div class="card-body p-0 pb-3 text-center" style="margin: 10px;">
                 <div id="toolbar" class="select">
-                  <select class="form-control">
-                    <option value="all">Xuất toàn bộ bảng</option>
-                    <option value="selected">Xuất dữ liệu đã chọn</option>
-                  </select>
+                  <div class="form-inline">
+                    <label>Chế độ xuất dữ liệu</label>
+                    <select class="form-control">
+                      <option value="all">Xuất toàn bộ bảng</option>
+                      <option value="selected">Xuất dữ liệu đã chọn</option>
+                    </select>
+                  </div>
+                  <div class="form-inline">
+                    <div class="form-check mb-2 mr-sm-2">
+                      <input class="form-check-input" type="checkbox" id="treKH">
+                      <label class="form-check-label">Trễ KH</label>
+                    </div>
+                  </div>
+                  <div class="form-inline">
+                    <div class="form-check mb-2 mr-sm-2">
+                      <input class="form-check-input" type="checkbox" id="loiExcel">
+                      <label class="form-check-label">Lỗi Excel</label>
+                    </div>
+                  </div>
                 </div>
-                <table class="table mb-0"
+                <table id="table" class="table mb-0"
                   data-toggle="table"
                   data-search="true"
                   data-pagination="true"
@@ -52,10 +67,10 @@
                       <th data-sortable="true" class="border-0">Hợp đồng</th>
                       <th data-sortable="true" class="border-0">Khối lượng</th>
                       <th data-sortable="true" class="border-0">Tải trọng</th>
-                      <th data-sortable="true" class="border-0">Thưởng</th>
-                      <th data-sortable="true" class="border-0">Phạt</th>
+                      <th data-sortable="true" data-field="ft" class="border-0">Thưởng</th>
+                      <th data-sortable="true" data-field="fp" class="border-0">Phạt</th>
                       <th data-sortable="true" class="border-0">Thời gian trao NOR</th>
-                      <th data-sortable="true" class="border-0">Bắt đầu tình dõi nhật</th>
+                      <th data-sortable="true" data-field="f1" class="border-0">Bắt đầu tình dõi nhật</th>
                       <th data-sortable="true" class="border-0">Bắt đầu dỡ hàng</th>
                       <th data-sortable="true" class="border-0">Kết thúc dỡ hàng</th>
                     </tr>
@@ -101,6 +116,7 @@
 {% block javascripts %}
 <script>
   var $table = $('#table')
+  
   $(function() {
     $('#toolbar').find('select').change(function () {
       $table.bootstrapTable('destroy').bootstrapTable({
@@ -108,6 +124,32 @@
         exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf']
       })
     }).trigger('change')
+
+    $('#toolbar').find('#treKH').click(function () {
+      if (this.checked) {
+        $table.bootstrapTable('filterBy', {
+          f1: ["Trễ KH"]
+        })
+      } else {
+        $table.bootstrapTable('filterBy', {})
+      }
+    })
+
+    $('#toolbar').find('#loiExcel').click(function () {
+      if (this.checked) {
+        $table.bootstrapTable('refreshOptions', {
+          filterOptions: {
+            filterAlgorithm: "or"
+          }
+        })
+        $table.bootstrapTable('filterBy', {
+          ft: ["--"],
+          fp: ["--"]
+        })
+      } else {
+        $table.bootstrapTable('filterBy', {})
+      }
+    })
   })
 </script>
 {% endblock javascripts %}
