@@ -17,8 +17,6 @@
         </div>
         <!-- End Page Header -->
         <!-- Default Light Table -->
-        <div class="buttons-toolbar">
-        </div>
         <div class="row">
           <div class="col">
             <div class="card card-small mb-4">
@@ -26,16 +24,28 @@
                 <h5 class="m-0">{{ laysheets_info }}</h5>
               </div>
               <div class="card-body p-0 pb-3 text-center" style="margin: 10px;">
+                <div id="toolbar" class="select">
+                  <select class="form-control">
+                    <option value="all">Xuất toàn bộ bảng</option>
+                    <option value="selected">Xuất dữ liệu đã chọn</option>
+                  </select>
+                </div>
                 <table class="table mb-0"
                   data-toggle="table"
                   data-search="true"
                   data-pagination="true"
-                  data-show-columns="true"
+                  data-page-size="50"
                   data-show-columns-toggle-all="true"
                   data-locale="vi-VN"
-                  data-visible-search="true">
+                  data-visible-search="true"
+                  data-show-fullscreen="true"
+                  data-show-export="true"
+                  data-toolbar="#toolbar"
+                  data-click-to-select="true"
+                  data-show-columns="true">
                   <thead class="bg-light">
                     <tr>
+                      <th data-field="state" data-checkbox="true"></th>
                       <th data-sortable="true" class="border-0">Tên tàu</th>
                       <th data-sortable="true" class="border-0">Chuyến</th>
                       <th data-sortable="true" class="border-0">Cảng dỡ hàng</th>
@@ -53,6 +63,7 @@
                   <tbody>
                     {% for laysheet in current_laysheets %}
                     <tr>
+                      <td></td>
                       <td>{{ laysheet.vehicle }}</td>
                       <td>{{ laysheet.vehicle_trip }}</td>
                       <td>{{ laysheet.discharge_port }}</td>
@@ -87,4 +98,16 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+  var $table = $('#table')
+  $(function() {
+    $('#toolbar').find('select').change(function () {
+      $table.bootstrapTable('destroy').bootstrapTable({
+        exportDataType: $(this).val(),
+        exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf']
+      })
+    }).trigger('change')
+  })
+</script>
+{% endblock javascripts %}
