@@ -10,15 +10,17 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.template import loader
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from django.conf import settings
 from django import template
 from app.models import Document, Laysheet
-from openpyxl import load_workbook
+from app.utils import load_excel, delete_document
+import os
 
 @login_required(login_url="/login/")
 def index(request):
     documents = Document.objects.all()
     laysheets = Laysheet.objects.all()
-    files = documents.order_by('-uploaded_at')[:10]
+    files = documents.order_by('-uploaded_at')[:20]
     laysheetId = request.GET.get('laysheetId', '')
     if laysheetId:
         laysheets = Laysheet.objects.filter(document=int(laysheetId))
@@ -31,6 +33,45 @@ def index(request):
     return render(request, "index.html", context)
 
 @login_required(login_url="/login/")
+def report(request):
+    laysheetId = request.GET.get('laysheetId', '')
+    if laysheetId:
+        document = Document.objects.get(pk=int(laysheetId))
+        laysheets = Laysheet.objects.filter(document=int(laysheetId))
+    else:
+        document = Document.objects.last()
+        laysheets = Laysheet.objects.filter(document=document)
+    context = {
+        "laysheets_info": document.title,
+        "current_laysheets": laysheets
+    }
+    return render(request, "report.html", context)
+
+@login_required(login_url="/login/")
+def remove(request):
+    laysheetId = request.GET.get('laysheetId', '')
+    if laysheetId:
+        document = Document.objects.get(pk=int(laysheetId))
+        file_path = os.path.join(settings.MEDIA_ROOT, document.path)
+        delete_document(file_path)
+        document.delete()
+    return redirect("/")
+
+@login_required(login_url="/login/")
+def download(request):
+    laysheetId = request.GET.get('laysheetId', '')
+    if laysheetId:
+        document = Document.objects.get(pk=int(laysheetId))
+        file_path = os.path.join(settings.MEDIA_ROOT, document.path)
+        print(file_path)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+                return response
+    return loader.get_template('error-404.html')
+
+@login_required(login_url="/login/")
 def pages(request):
     context = {}
     try:
@@ -41,59 +82,6 @@ def pages(request):
         html_template = loader.get_template( 'error-500.html' )
     finally:
         return HttpResponse(html_template.render(context, request))
-
-def load_excel(path):
-    wb = load_workbook(path, data_only=True)
-    for ws in wb:
-        if ws["A1"].value and "BẢNG TÍNH THỜI GIAN DÔI NHẬT" in ws["A1"].value:
-            print("valid worksheet", ws.title)
-        else:
-            print("invalid worksheet", ws.title)
-            continue
-        vehicle = ws["E2"].value
-        if vehicle == "#N/A":
-            continue
-        vehicle_trip = ws["E3"].value
-        contract = ws["E4"].value
-        discharge_port = ws["B7"].value
-        arrival_windows = ws["B9"].value
-        NOR_tendered = ws["H7"].value
-        NOR_accepted = ws["H9"].value
-        commenced_discharging = ws["H11"].value
-        completed_discharging = ws["H13"].value
-        weight = ws["B11"].value
-        load = ws["B13"].value
-        despatch = ws["B15"].value
-        demurrage = ws["B17"].value
-        laytime_allowed = ws["A16"].value
-
-        real_despatch = 0
-        real_demurrage  = 0
-        for row in ws.iter_rows(min_row=20):
-            for cell in row:
-                if "Tiền thưởng" in str(cell.value):
-                    real_despatch = ws["H" + str(cell.row)].value
-                if "Tiền phạt" in str(cell.value):
-                    real_demurrage = ws["H" + str(cell.row)].value
-
-        results = {
-            "vehicle": vehicle,
-            "vehicle_trip": vehicle_trip,
-            "contract": contract,
-            "discharge_port": discharge_port,
-            "NOR_tendered": NOR_tendered,
-            "NOR_accepted": NOR_accepted,
-            "commenced_discharging": commenced_discharging,
-            "completed_discharging": completed_discharging,
-            "weight": weight,
-            "load": load,
-            "despatch": despatch,
-            "demurrage": demurrage,
-            "laytime_allowed": laytime_allowed,
-            "real_despatch": real_despatch,
-            "real_demurrage": real_demurrage
-        }
-        yield results
 
 @login_required(login_url="/login/")
 @csrf_exempt
@@ -109,10 +97,9 @@ def document_upload(request):
         )
         documents_info = load_excel(fs.path(filename))
         for document_info in documents_info:
-            print(document_info)
-            # laysheet = Laysheet.objects.create(
-            #     document=db_document,
-            #     **document_info
-            # )
+            laysheet = Laysheet.objects.create(
+                document=db_document,
+                **document_info
+            )
 
-    return HttpResponse("success")
+    return HttpResponse({"success"}, content_type="text/plain")

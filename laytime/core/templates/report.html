@@ -1,0 +1,90 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Danh sách tàu {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="main-content-container container-fluid px-4">
+        <!-- Page Header -->
+        <div class="page-header row no-gutters py-4">
+          <div class="col-12 col-sm-4 text-center text-sm-left mb-0">
+            <span class="text-uppercase page-subtitle">Bảng chi tiết</span>
+            <h3 class="page-title">Danh sách các chuyến</h3>
+          </div>
+        </div>
+        <!-- End Page Header -->
+        <!-- Default Light Table -->
+        <div class="buttons-toolbar">
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="card card-small mb-4">
+              <div class="card-header border-bottom">
+                <h5 class="m-0">{{ laysheets_info }}</h5>
+              </div>
+              <div class="card-body p-0 pb-3 text-center" style="margin: 10px;">
+                <table class="table mb-0"
+                  data-toggle="table"
+                  data-search="true"
+                  data-pagination="true"
+                  data-show-columns="true"
+                  data-show-columns-toggle-all="true"
+                  data-locale="vi-VN"
+                  data-visible-search="true">
+                  <thead class="bg-light">
+                    <tr>
+                      <th data-sortable="true" class="border-0">Tên tàu</th>
+                      <th data-sortable="true" class="border-0">Chuyến</th>
+                      <th data-sortable="true" class="border-0">Cảng dỡ hàng</th>
+                      <th data-sortable="true" class="border-0">Hợp đồng</th>
+                      <th data-sortable="true" class="border-0">Khối lượng</th>
+                      <th data-sortable="true" class="border-0">Tải trọng</th>
+                      <th data-sortable="true" class="border-0">Thưởng</th>
+                      <th data-sortable="true" class="border-0">Phạt</th>
+                      <th data-sortable="true" class="border-0">Thời gian trao NOR</th>
+                      <th data-sortable="true" class="border-0">Bắt đầu tình dõi nhật</th>
+                      <th data-sortable="true" class="border-0">Bắt đầu dỡ hàng</th>
+                      <th data-sortable="true" class="border-0">Kết thúc dỡ hàng</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for laysheet in current_laysheets %}
+                    <tr>
+                      <td>{{ laysheet.vehicle }}</td>
+                      <td>{{ laysheet.vehicle_trip }}</td>
+                      <td>{{ laysheet.discharge_port }}</td>
+                      <td>{{ laysheet.contract }}</td>
+                      <td>{{ laysheet.weight }}</td>
+                      <td>{{ laysheet.load }}</td>
+                      {% if laysheet.real_despatch == -1 %}
+                      <td>--</td>
+                      {% else %}
+                      <td>{{ laysheet.real_despatch }}</td>
+                      {% endif %}
+                      {% if laysheet.real_demurrage == -1 %}
+                      <td>--</td>
+                      {% else %}
+                      <td>{{ laysheet.real_demurrage }}</td>
+                      {% endif %}
+                      <td>{{ laysheet.NOR_tendered }}</td>
+                      <td>{{ laysheet.NOR_accepted }}</td>
+                      <td>{{ laysheet.commenced_discharging }}</td>
+                      <td>{{ laysheet.completed_discharging }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Default Light Table -->
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
