@@ -35,6 +35,7 @@ def index(request):
 @login_required(login_url="/login/")
 def report(request):
     laysheetId = request.GET.get('laysheetId', '')
+    documents = Document.objects.all().values("id", "title")[:30]
     if laysheetId:
         document = Document.objects.get(pk=int(laysheetId))
         laysheets = Laysheet.objects.filter(document=int(laysheetId))
@@ -42,6 +43,7 @@ def report(request):
         document = Document.objects.last()
         laysheets = Laysheet.objects.filter(document=document)
     context = {
+        "documents": documents,
         "laysheets_info": document.title,
         "current_laysheets": laysheets
     }
