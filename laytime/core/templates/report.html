@@ -6,7 +6,6 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-
     <div class="main-content-container container-fluid px-4">
         <!-- Page Header -->
         <div class="page-header row no-gutters py-4">
@@ -21,8 +20,12 @@
           <div class="col">
             <div class="card card-small mb-4">
               <div class="card-header border-bottom">
-                <h5 class="m-0">{{ laysheets_info }}</h5>
-                <button type="button" class="btn btn-info">Download</button>
+                <!-- <h5 class="m-0">{{ laysheets_info }}</h5> -->
+                <select id="change_files" name="pitcher" class="form-control">
+                  {% for option in documents %}
+                      <option value="{{ option.id }}">{{ option.title }}</option>
+                  {% endfor %}
+                </select>
               </div>
               <div class="card-body p-0 pb-3 text-center" style="margin: 10px;">
                 <div id="toolbar" class="select">
@@ -45,6 +48,7 @@
                       <label class="form-check-label">Lỗi Excel</label>
                     </div>
                   </div>
+                  <!-- <button type="button" class="btn btn-info">Download</button> -->
                 </div>
                 <table id="table" class="table mb-0"
                   data-toggle="table"
@@ -135,6 +139,17 @@
         $table.bootstrapTable('filterBy', {})
       }
     })
+
+    $(function(){
+      // bind change event to select
+      $('#change_files').on('change', function () {
+          var url = $(this).val();
+          if (url) {
+              window.location = "./report?laysheetId=" + url;
+          }
+          return false;
+      });
+    });
 
     $('#toolbar').find('#loiExcel').click(function () {
       if (this.checked) {
